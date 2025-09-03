@@ -1,0 +1,109 @@
+<div class="event-container">
+  <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-form">
+    <!-- Back button -->
+    <div class="back-btn">
+      <button
+        matFab
+        color="accent"
+        type="button"
+        (click)="navigateBackToHome()"
+      >
+        <mat-icon>keyboard_backspace</mat-icon>
+      </button>
+    </div>
+
+    <h1 class="text-3xl font-bold flex justify-center mb-6">Event Form</h1>
+
+    <!-- Title -->
+    <mat-form-field appearance="outline" class="form-field" floatLabel="always">
+      <mat-label>Title *</mat-label>
+      <input
+        matInput
+        id="title"
+        formControlName="title"
+        placeholder="Enter event title"
+        required
+      />
+      <mat-error *ngIf="title?.hasError('required')">
+        Title is required
+      </mat-error>
+      <mat-error *ngIf="title?.hasError('minlength')">
+        Title must be at least 3 characters long
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Date -->
+    <mat-form-field appearance="outline" class="form-field" floatLabel="always">
+      <mat-label>Date *</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        id="date"
+        formControlName="date"
+        required
+      />
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="date?.hasError('required')">
+        Date is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Location -->
+    <mat-form-field appearance="outline" class="form-field" floatLabel="always">
+      <mat-label>Location *</mat-label>
+      <input
+        matInput
+        id="location"
+        formControlName="location"
+        placeholder="Enter event location"
+        required
+      />
+      <mat-error *ngIf="location?.hasError('required')">
+        Location is required
+      </mat-error>
+      <mat-error *ngIf="location?.hasError('minlength')">
+        Location must be at least 2 characters long
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Description -->
+    <mat-form-field appearance="outline" class="form-field" floatLabel="always">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        id="description"
+        formControlName="description"
+        placeholder="Enter event description (optional)"
+        rows="4"
+      ></textarea>
+    </mat-form-field>
+
+    <!-- Action buttons -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        matButton="filled"
+        color="primary"
+        [disabled]="eventForm.invalid"
+      >
+        {{ eventId ? "Modify Event" : "Create Event" }}
+        <mat-icon>create</mat-icon>
+      </button>
+
+      <button
+        type="button"
+        matButton="tonal"
+        color="warn"
+        class="ml-2"
+        (click)="eventForm.reset()"
+      >
+        Reset
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </form>
+</div>

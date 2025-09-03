@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="demo-button-container">
+    <button matButton="filled" (click)="addData()">
+      Add Event
+      <mat-icon>add_circle_outline</mat-icon>
+    </button>
+
+    <!-- <mat-form-field appearance="outline">
+      <mat-date-range-input
+        [rangePicker]="picker"
+        (dateChange)="onDateRangeChange($event)"
+      >
+        <input matStartDate placeholder="Start date" />
+        <input matEndDate placeholder="End date" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field> -->
+  </div>
+
+  <div class="table-container">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Enter the event name"
+        #input
+      />
+    </mat-form-field>
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+          <td mat-cell *matCellDef="let row">{{row.id}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Event Name</th>
+          <td mat-cell *matCellDef="let row">{{row.title}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let row">{{row.date | date: 'medium'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
+          <td mat-cell *matCellDef="let row">{{row.location}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+          <td mat-cell *matCellDef="let row">{{row.description}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+          <td mat-cell *matCellDef="let row">
+            <button matButton="tonal" (click)="editEvent(row)">
+              Edit <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              matButton="tonal"
+              class="delete-button"
+              (click)="removeData(row)"
+            >
+              Delete
+
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell">
+            No data matching the filter "{{input.value}}"
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator
+        [pageSizeOptions]="pageSizeOptions"
+        showFirstLastButtons
+        aria-label="Select page of users"
+      ></mat-paginator>
+    </div>
+  </div>
+</div>
