@@ -17,8 +17,10 @@
     </button>
   </div>
 
-  @if(viewMode === 'table') {
-  <div class="table-container">
+  <div
+    class="table-container"
+    [ngStyle]="{'display': viewMode === 'table' ? 'block' : 'none'}"
+  >
     <mat-form-field>
       <mat-label>Filter</mat-label>
       <input
@@ -95,7 +97,7 @@
       ></mat-paginator>
     </div>
   </div>
-  } @else if (viewMode === 'calendar') {
-  <app-calendar [eventData]="eventData"></app-calendar>
-  }
+  <div [ngStyle]="{'display': viewMode === 'calendar' ? 'block' : 'none'}">
+    <app-calendar [eventData]="eventData"></app-calendar>
+  </div>
 </div>
