@@ -1,0 +1,23 @@
+.calendar-container {
+  padding: 1rem;
+  background: var(--bg-color);
+  border-radius: 8px;
+  box-shadow: var(--mat-elevation-z4);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.calendar-button {
+  margin: 0 0.2rem;
+}

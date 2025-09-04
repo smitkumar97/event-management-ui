@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { Toast } from '../../services/toast';
 
 @Component({
   selector: 'app-add-event',
@@ -23,7 +24,7 @@ export class AddEvent {
   eventId!: string | null;
   eventData = JSON.parse(localStorage.getItem('eventList') || '');
 
-  constructor(private fb: FormBuilder, private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private router: Router, private activatedRoute: ActivatedRoute, private toaster: Toast) {
     this.eventForm = this.createForm();
     this.eventId = this.activatedRoute.snapshot.paramMap.get('id');
   }
@@ -73,6 +74,11 @@ export class AddEvent {
 
       this.eventData = [...this.eventData, eventData];
       localStorage.setItem('eventList', JSON.stringify(this.eventData));
+      if (this.eventId) {
+        this.toaster.showSuccess('Event modified successfully.');
+      } else {
+        this.toaster.showSuccess('Event created successfully.');
+      }
       this.eventForm.reset();
       this.navigateBackToHome();
     } else {

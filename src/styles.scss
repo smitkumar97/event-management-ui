@@ -1,4 +1,7 @@
 @use "@angular/material" as mat;
+@use "ngx-toastr/toastr" as *;
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,7 +28,23 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-html,
-body {
-  height: 100%;
+:root {
+  --sky-blue: #4f86f7;
+  --deep-blue: #2a4b8c;
+  --soft-teal: #5ed3cc;
+  --warm-gray: #f5f7fa;
+  --cool-gray: #e1e5eb;
+  --button-bg: #007bff;
+  --button-hover: #0069d9;
+  --dark-charcoal: #2c3e50;
+  --pure-white: #ffffff;
+  --alert-red: #d34654;
+  --success-green: #51cf66;
+  --bg-color: #fafafa;
+  --chat-bg: #e5e8eb;
+  --column-bg: #f3f4f6;
+}
+
+.toast-top-center {
+  top: 30px;
 }
