@@ -1,4 +1,8 @@
-import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -6,21 +10,33 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { EventData } from '../../models/event.model';
-import { CommonModule, DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
-import { createNewUser } from '../../utils/utils';
-import { Toast } from '../../services/toast';
-import { Calendar } from '../calendar/calendar';
 import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
+import { EventData } from '../../models/event.model';
+import { createNewUser } from '../../utils/utils';
+import { Toast } from '../../services/toast';
+import { Calendar } from '../calendar/calendar';
+
 @Component({
   selector: 'app-dashboard',
-  imports: [Calendar, MatRadioModule, MatDatepickerModule, CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, DatePipe],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    DatePipe,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatRadioModule,
+    MatDatepickerModule,
+    Calendar,
+  ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -59,15 +75,15 @@ export class Dashboard implements AfterViewInit {
 
   loadEventData(): void {
     const storedData = localStorage.getItem('eventList');
+    this.eventData = storedData
+      ? JSON.parse(storedData)
+      : Array.from({ length: 100 }, (_, k) => createNewUser(k + 1));
 
-    if (!storedData || storedData === '') {
-      this.eventData = Array.from({ length: 100 }, (_, k) => createNewUser(k + 1));
+    if (!storedData) {
       localStorage.setItem('eventList', JSON.stringify(this.eventData));
-    } else {
-      this.eventData = JSON.parse(storedData);
     }
 
-    this.dataSource.data = this.eventData;
+    this.dataSource.data = this.eventData.sort((a: any, b: any) => a.id - b.id);
   }
 
   applyFilter(event: Event) {
@@ -80,17 +96,20 @@ export class Dashboard implements AfterViewInit {
   }
 
   applyDateFilter() {
-    if ((this.rangeForm.controls.start.valid && this.rangeForm.controls.start.value) && (this.rangeForm.controls.end.value && this.rangeForm.controls.end.value)) {
-      const start = new Date(this.rangeForm.controls.start.value).setHours(0, 0, 0, 0);
-      const end = new Date(this.rangeForm.controls.end.value).setHours(23, 59, 59, 999);
+    const start = this.rangeForm.controls.start.value
+      ? new Date(this.rangeForm.controls.start.value).setHours(0, 0, 0, 0)
+      : null;
+    const end = this.rangeForm.controls.end.value
+      ? new Date(this.rangeForm.controls.end.value).setHours(23, 59, 59, 999)
+      : null;
 
-      this.dataSource.data = this.eventData.filter((event: EventData) => {
-        const eventDate = new Date(event.date).getTime();
-        return eventDate >= start && eventDate <= end;
-      });
-    } else {
-      this.dataSource.data = this.eventData;
-    }
+    this.dataSource.data =
+      start && end
+        ? this.eventData.filter((event: EventData) => {
+          const eventDate = new Date(event.date).getTime();
+          return eventDate >= start && eventDate <= end;
+        })
+        : this.eventData;
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();

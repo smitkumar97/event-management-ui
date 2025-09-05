@@ -1,19 +1,29 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { EventData } from '../../models/event.model';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
 import { provideNativeDateAdapter } from '@angular/material/core';
+
+import { EventData } from '../../models/event.model';
 import { Toast } from '../../services/toast';
 
 @Component({
   selector: 'app-add-event',
-  imports: [ReactiveFormsModule, CommonModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, FormsModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatIconModule,],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-event.html',
   styleUrl: './add-event.scss'
@@ -24,7 +34,12 @@ export class AddEvent {
   eventId!: string | null;
   eventData = JSON.parse(localStorage.getItem('eventList') || '');
 
-  constructor(private fb: FormBuilder, private router: Router, private activatedRoute: ActivatedRoute, private toaster: Toast) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private toaster: Toast
+  ) {
     this.eventForm = this.createForm();
     this.eventId = this.activatedRoute.snapshot.paramMap.get('id');
   }
@@ -40,24 +55,18 @@ export class AddEvent {
 
   ngOnInit(): void {
     if (this.eventId) {
-      let event = this.eventData.filter((element: EventData) => element.id == this.eventId);
-      this.eventData = this.eventData.filter((element: EventData) => element.id !== this.eventId);
-      this.eventForm.patchValue({
-        title: event[0].title,
-        date: this.convertTimestampToDateString(event[0].date),
-        location: event[0].location,
-        description: event[0].description
-      });
+      const event = this.eventData.find((e: EventData) => e.id == this.eventId);
+      if (event) {
+        this.eventData = this.eventData.filter((e: EventData) => e.id !== this.eventId);
+
+        this.eventForm.patchValue({
+          title: event.title,
+          date: new Date(event.date),
+          location: event.location,
+          description: event.description,
+        });
+      }
     }
-  }
-
-  private convertTimestampToDateString(timestamp: number): string {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
   }
 
   onSubmit(): void {
@@ -67,18 +76,18 @@ export class AddEvent {
       const eventData: EventData = {
         id: this.eventId ? this.eventId : this.eventData.length + 1,
         title: formValue.title,
-        date: formValue.date,
+        date: formValue.date instanceof Date ? formValue.date.getTime() : formValue.date,
         location: formValue.location,
         description: formValue.description || ''
       };
 
-      this.eventData = [...this.eventData, eventData];
+      this.eventData = [eventData, ...this.eventData];
       localStorage.setItem('eventList', JSON.stringify(this.eventData));
-      if (this.eventId) {
-        this.toaster.showSuccess('Event modified successfully.');
-      } else {
-        this.toaster.showSuccess('Event created successfully.');
-      }
+
+      this.toaster.showSuccess(
+        this.eventId ? 'Event modified successfully.' : 'Event created successfully.'
+      );
+
       this.eventForm.reset();
       this.navigateBackToHome();
     } else {
