@@ -13,11 +13,15 @@ import { createNewUser } from '../../utils/utils';
 import { Toast } from '../../services/toast';
 import { Calendar } from '../calendar/calendar';
 import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Calendar, MatRadioModule, CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, DatePipe],
+  imports: [Calendar, MatRadioModule, MatDatepickerModule, CommonModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 
@@ -29,6 +33,10 @@ export class Dashboard implements AfterViewInit {
   pageSizeOptions = [5, 10, 25, 100];
   eventData: any;
   viewMode: 'table' | 'calendar' = 'table';
+  readonly rangeForm = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  });
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -71,6 +79,25 @@ export class Dashboard implements AfterViewInit {
     }
   }
 
+  applyDateFilter() {
+    if ((this.rangeForm.controls.start.valid && this.rangeForm.controls.start.value) && (this.rangeForm.controls.end.value && this.rangeForm.controls.end.value)) {
+      const start = new Date(this.rangeForm.controls.start.value).setHours(0, 0, 0, 0);
+      const end = new Date(this.rangeForm.controls.end.value).setHours(23, 59, 59, 999);
+
+      this.dataSource.data = this.eventData.filter((event: EventData) => {
+        const eventDate = new Date(event.date).getTime();
+        return eventDate >= start && eventDate <= end;
+      });
+    } else {
+      this.dataSource.data = this.eventData;
+    }
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+
   addData() {
     this.router.navigate(['./event']);
   }
@@ -88,5 +115,10 @@ export class Dashboard implements AfterViewInit {
 
   switchView(event: MatRadioChange) {
     this.viewMode = event.value;
+  }
+
+  resetDates() {
+    this.rangeForm.reset();
+    this.applyDateFilter();
   }
 }

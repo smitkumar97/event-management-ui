@@ -1,35 +1,84 @@
 <div class="container">
   <div class="demo-button-container">
-    <mat-radio-group
-      aria-label="Select an option"
-      [(ngModel)]="viewMode"
-      (change)="switchView($event)"
-    >
-      <mat-radio-button value="table" [checked]="true"
-        >Table View</mat-radio-button
+    <div>
+      <mat-radio-group
+        aria-label="Select an option"
+        [(ngModel)]="viewMode"
+        (change)="switchView($event)"
       >
-      <mat-radio-button value="calendar">Calendar View</mat-radio-button>
-    </mat-radio-group>
+        <mat-radio-button value="table" [checked]="true"
+          >Table View</mat-radio-button
+        >
+        <mat-radio-button value="calendar">Calendar View</mat-radio-button>
+      </mat-radio-group>
+    </div>
 
-    <button matButton="filled" (click)="addData()">
-      Add Event
-      <mat-icon>add_circle_outline</mat-icon>
-    </button>
+    <div>
+      <button matButton="filled" (click)="addData()">
+        Add Event
+        <mat-icon>add_circle_outline</mat-icon>
+      </button>
+    </div>
   </div>
 
   <div
     class="table-container"
     [ngStyle]="{'display': viewMode === 'table' ? 'block' : 'none'}"
   >
-    <mat-form-field>
-      <mat-label>Filter</mat-label>
-      <input
-        matInput
-        (keyup)="applyFilter($event)"
-        placeholder="Enter the event name"
-        #input
-      />
-    </mat-form-field>
+    <div class="flex justify-start filter-container">
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Filter</mat-label>
+          <input
+            matInput
+            (keyup)="applyFilter($event)"
+            placeholder="Enter the event name"
+            #input
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="date-range-filters">
+        <mat-form-field
+          appearance="outline"
+          class="form-field"
+          floatLabel="always"
+        >
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [formGroup]="rangeForm" [rangePicker]="picker">
+            <input
+              matStartDate
+              formControlName="start"
+              placeholder="Start date"
+              (dateChange)="applyDateFilter()"
+            />
+            <input
+              matEndDate
+              formControlName="end"
+              placeholder="End date"
+              (dateChange)="applyDateFilter()"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+
+          @if (rangeForm.controls.start.hasError('matStartDateInvalid')) {
+          <mat-error>Invalid start date</mat-error>
+          } @if (rangeForm.controls.end.hasError('matEndDateInvalid')) {
+          <mat-error>Invalid end date</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex justify-center item-center reset-date">
+          <button matMiniFab type="button" (click)="resetDates()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="mat-elevation-z8">
       <table mat-table [dataSource]="dataSource" matSort>
